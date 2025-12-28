@@ -1,0 +1,81 @@
+.login-page{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-image: url('../assets/start-background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.instruction{
+    color:white;
+    font-size: 25px;
+    display: flex;
+    padding: 0 30px;
+    padding-top: 20px;
+    justify-content: center;
+}
+
+h2{
+    color: white;
+    display: flex;
+    font-size: 100px;
+    padding-top: 100px;
+    justify-content: center;
+}
+
+
+.login-page input{
+    background-color: gainsboro;
+    width: 250px;
+    height: 60px;
+    border-radius: 20px;
+    font-size: 18px;
+    color: darkolivegreen;
+    padding: 0 30px;
+
+}
+
+.fields{
+    padding: 150px;
+    display: flex;
+    justify-content: center;
+    gap: 100px;
+}
+
+.login-page input:focus{
+    background-color: rgb(69, 69, 69);
+    color: white
+}
+.login-buttons{
+    display: flex;
+    justify-content: center;
+    gap: 100px;
+}
+.login-page button{
+    height: 80px;
+    width: 150px;
+    border-radius: 60px;
+    background-color: green;
+    font-size: 20px;
+    color: white;
+    font-weight: 1000;
+    transition: transform 0.3s, text-shadow 0.3s;
+}
+.login-page button:hover {
+    text-shadow: 0px 5px 5px black;
+    transform: translateY(-10px);
+    transition: 0.3s;
+    background-color: rgb(109, 191, 109);
+}
+
+@media (max-width: 1000px) {
+    .fields {
+        flex-direction: column;
+        justify-content: unset;
+        align-items: center;
+        gap: 30px;
+        padding: 50px;
+    }
+}

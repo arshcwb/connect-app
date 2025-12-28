@@ -1,0 +1,85 @@
+.settings-modal {
+    background: white;
+    width: 400px;
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    animation: popIn 0.2s ease;
+}
+
+.close-btn-abs {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.settings-menu h3, .settings-sub-page h3 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #dbdbdb;
+    padding-bottom: 15px;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.setting-item:hover {
+    background-color: #fafafa;
+}
+
+.setting-item.danger { color: #ed4956; }
+.setting-item.logout { color: #ed4956; border-bottom: none; }
+.danger-text { color: #ed4956; }
+
+/* Sub Pages */
+.settings-sub-page input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    background: #fafafa;
+}
+
+.sub-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+}
+
+.confirm-btn {
+    background-color: #0095f6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-confirm-btn {
+    background-color: #ed4956;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}

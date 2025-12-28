@@ -1,0 +1,117 @@
+.profile-page {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.profile-header-card {
+    background: white;
+    border: 1px solid #dbdbdb;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.profile-cover {
+    height: 100px;
+    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+}
+
+.profile-info-container {
+    padding: 0 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-avatar-wrapper {
+    margin-top: -50px;
+    margin-bottom: -60px;
+}
+
+.profile-avatar-lg {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid white;
+    object-fit: cover;
+    background: #eee;
+}
+
+.profile-name {
+    color: black;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.profile-username {
+    color: #666;
+    margin: 2px 0 10px 0;
+}
+
+.profile-meta {
+    font-size: 14px;
+    color: #555;
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.profile-actions {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.edit-btn, .friend-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #dbdbdb;
+    background: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.friend-btn {
+    background: #0095f6;
+    color: white;
+    border: none;
+}
+
+.profile-stats {
+    display: flex;
+    border-top: 1px solid #efefef;
+    padding: 15px 0;
+}
+
+.stat-box {
+    flex: 1;
+    text-align: center;
+    border-right: 1px solid #efefef;
+}
+
+.stat-box:last-child {
+    border-right: none;
+}
+
+.stat-num {
+    display: block;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.private-message, .empty-message {
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #dbdbdb;
+    margin-top: 10px;
+    color: #555;
+}

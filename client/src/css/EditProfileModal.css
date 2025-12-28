@@ -1,0 +1,270 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.edit-modal {
+    background: white;
+    width: 650px;
+    max-width: 95%;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    overflow: hidden;
+    animation: popIn 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+@keyframes popIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+    padding: 12px 20px;
+    border-bottom: 1px solid #dbdbdb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #262626;
+}
+
+.close-btn {
+    position: absolute;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #262626;
+}
+
+.modal-body {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.edit-picture-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #fafafa;
+    border-radius: 8px;
+    border: 1px solid #efefef;
+}
+
+.edit-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 1px solid #dbdbdb;
+}
+
+.picture-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.change-pic-btn {
+    background: none;
+    border: none;
+    color: #0095f6;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.remove-pic-btn {
+    background: none;
+    border: none;
+    color: #ed4956;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+}
+
+.form-group label {
+    width: 120px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #262626;
+    text-align: right;
+    margin-right: 25px;
+    flex-shrink: 0;
+}
+
+.form-group input, 
+.form-group textarea {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #262626;
+    background: #fff;
+}
+
+.form-group textarea {
+    resize: none;
+    font-family: inherit;
+}
+
+.form-group input:focus, 
+.form-group textarea:focus {
+    border-color: #a8a8a8;
+    outline: none;
+}
+
+.privacy-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #dbdbdb;
+}
+
+.privacy-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.privacy-info p {
+    margin: 0;
+    font-size: 12px;
+    color: #8e8e8e;
+    line-height: 1.4;
+    max-width: 350px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #0095f6;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #dbdbdb;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+}
+
+.save-btn {
+    background-color: #0095f6;
+    color: white;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    background-color: #0085df;
+}
+
+.save-btn:disabled {
+    background-color: #b2dffc;
+    cursor: default;
+}
+
+@media (max-width: 600px) {
+    .edit-modal {
+        width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .form-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .form-group label {
+        text-align: left;
+        margin-bottom: 8px;
+        width: 100%;
+    }
+}
