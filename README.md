@@ -117,7 +117,7 @@ Few examples:
 - /api/v1/notification - Fetching, marking read, and deleting notifications.
 
 ## Project Structure
-
+```bash
 server/
 ├─ public/uploads      (temporary location for images)
 ├─ src/
@@ -144,3 +144,4 @@ client/
 │  ├─ App.jsx         (Main App component)
 │  └─ main.jsx        (React entry point)
 └─ vite.config.js      (Vite configuration)
+```
