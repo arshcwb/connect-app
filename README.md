@@ -3,6 +3,8 @@
 ## Description
 This is a full-stack social media web application built using the MERN stack (MongoDB, Express.js, React.js, Node.js). It provides a secure and responsive environment for users to connect, manage profiles, search for others, and handle friend requests. The application emphasizes security through robust authentication flows (Access & Refresh Tokens) and offers a seamless user experience with optimized state management via Redux Toolkit.
 
+Note: This project is not finished. It is open to contributions and new feature additions. The backend is fully production-ready, while the frontend is where contributions are most welcome. Requests and suggestions for new features are open for both backend and frontend improvements.
+
 ## Tech Stack
 
 ### Backend
@@ -60,9 +62,12 @@ This is a full-stack social media web application built using the MERN stack (Mo
 ### 1. Backend Setup
 1. Navigate to the server directory.
 2. Install dependencies:
-   npm install
+    ```bash
+    npm install
+    ```
 3. Create a .env file in the root of the server directory with the following variables:
-   
+
+   ``` bash
    # Server
    PORT=5000
 
@@ -82,26 +87,31 @@ This is a full-stack social media web application built using the MERN stack (Mo
    CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
    CLOUDINARY_API_KEY=your_cloudinary_api_key
    CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-
+   ```
 4. Start the server:
+   ```bash
    npm run dev
+   ```
 
 ### 2. Frontend Setup
 1. Navigate to the client directory.
 2. Install dependencies:
    npm install
 3. Create a .env file in the root of the client directory with the following variable:
-
+   ```bash
    # Frontend environment variables
    VITE_API_BASE_URL=http://localhost:5000/api/v1
+   ```
 
 4. Start the development server:
+   ```bash
    npm run dev
+   ```
 
 ## API Architecture
 
 The application uses a RESTful API structure with versioning (v1).
-
+Few examples:
 - /api/v1/user - Authentication, profile updates, and user search.
 - /api/v1/friend - Sending, accepting, and rejecting friend requests.
 - /api/v1/notification - Fetching, marking read, and deleting notifications.
@@ -109,21 +119,28 @@ The application uses a RESTful API structure with versioning (v1).
 ## Project Structure
 
 server/
-|-- src/
-    |-- controllers/    (Route logic)
-    |-- middlewares/    (Auth, Multer, Error handling)
-    |-- models/         (Mongoose schemas)
-    |-- routes/         (API endpoints)
-    |-- utils/          (Helper functions, AsyncHandler)
-    |-- app.js          (Express configuration)
-    |-- index.js        (Server entry point)
+├─ public/uploads      (temporary location for images)
+├─ src/
+│  ├─ controllers/       (Route logic)
+│  ├─db/                 (MongoDB connection)
+│  ├─ middlewares/       (Auth, error handling, multer, etc.)
+│  ├─ models/            (Mongoose schemas)
+│  ├─ routes/            (API endpoints)
+│  ├─ app.js             (Express app setup)
+│  ├─ index.js           (Server entry point)
+│  └─ constants.js       (Stores Constants)
+└─ utils/             (Helper functions, AsyncHandler)
+
 
 client/
-|-- src/
-    |-- assets/         (Static images)
-    |-- components/     (Reusable UI components)
-    |-- css/            (Stylesheets)
-    |-- features/       (Redux slices for Auth, Notification)
-    |-- services/       (Axios configuration)
-    |-- App.jsx         (Main component)
-    |-- main.jsx        (Entry point)
+├─ src/
+│  ├─ app/            (maintains store)
+│  ├─ assets/         (Static images)
+│  ├─ components/     (Reusable UI components)
+│  ├─ css/            (Stylesheets)
+│  ├─ features/       (Redux slices)
+│  ├─ pages/          (Page components)
+│  ├─ services/       (Axios instances, API requests)
+│  ├─ App.jsx         (Main App component)
+│  └─ main.jsx        (React entry point)
+└─ vite.config.js      (Vite configuration)
