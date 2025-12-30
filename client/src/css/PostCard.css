@@ -180,3 +180,8 @@
 .count-link {
     cursor: pointer
 }
+.likes-modal {
+    color: white;
+    background-color: rgba(103, 103, 103, 0.5);
+    border-radius: 20px;
+}

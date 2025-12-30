@@ -1,54 +1,60 @@
-import { useState, useRef, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes, faImage } from "@fortawesome/free-solid-svg-icons";
-import api from "../../services/api";
-import { fetchFeed } from "../../features/feed/feedSlice";
-import "../../css/CreatePost.css";
+import { useState, useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes, faImage } from '@fortawesome/free-solid-svg-icons';
+import api from '../../services/api';
+import { fetchFeed } from '../../features/feed/feedSlice';
+import noProfile from '../../assets/no-profile-picture.jpg';
+import '../../css/CreatePost.css';
 
-export default function CreatePost({ onClose }) {
+export default function CreatePostModal({ onClose }) {
     const dispatch = useDispatch();
-    const fileInputRef = useRef(null);
     
-    const { user: authData } = useSelector((state) => state.auth);
-    const currentUser = authData?.user || authData;
-    const defaultVisibility = currentUser?.profileVisibility === "private" ? "friends" : "public";
+    const { user } = useSelector((state) => state.auth);
+    const currentUser = user?.user || user;
+    const profileVisibility = currentUser?.profileVisibility || 'public'; 
+
+    let allowedOptions = [];
+
+    if (profileVisibility === 'public') {
+        allowedOptions = [
+            { value: 'public', label: 'Public (Everyone)' },
+            { value: 'private', label: 'Only Me' }
+        ];
+    } else {
+        allowedOptions = [
+            { value: 'friends', label: 'Friends Only' },
+            { value: 'private', label: 'Only Me' }
+        ];
+    }
 
     const [content, setContent] = useState("");
-    const [files, setFiles] = useState([]); 
-    const [previews, setPreviews] = useState([]); 
-    const [visibility, setVisibility] = useState(defaultVisibility);
+    const [visibility, setVisibility] = useState(allowedOptions[0].value);
+    const [files, setFiles] = useState([]);
+    const [previews, setPreviews] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    const fileInputRef = useRef(null);
 
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
-
-        if (files.length + selectedFiles.length > 10) {
-            alert("Maximum 10 files allowed");
-            
-            if (fileInputRef.current) fileInputRef.current.value = "";
+        if (selectedFiles.length + files.length > 5) {
+            alert("Max 5 files allowed");
             return;
         }
 
-        setFiles([...files, ...selectedFiles]);
         const newPreviews = selectedFiles.map(file => URL.createObjectURL(file));
-        setPreviews([...previews, ...newPreviews]);
+        setFiles(prev => [...prev, ...selectedFiles]);
+        setPreviews(prev => [...prev, ...newPreviews]);
     };
 
-    const removeImage = (index) => {
-        const newFiles = [...files];
-        const newPreviews = [...previews];
-        newFiles.splice(index, 1);
-        newPreviews.splice(index, 1);
-        setFiles(newFiles);
-        setPreviews(newPreviews);
+    const removeFile = (index) => {
+        setFiles(prev => prev.filter((_, i) => i !== index));
+        setPreviews(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async () => {
-        if (!content.trim() && files.length === 0) {
-            alert("Post can not be empty");
-            return;
-        }
+        if (!content.trim() && files.length === 0) return;
 
         setLoading(true);
         const formData = new FormData();
@@ -60,43 +66,61 @@ export default function CreatePost({ onClose }) {
         });
 
         try {
-            await api.post("/post/create", formData);
+            await api.post("/post/create", formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
             
-            dispatch(fetchFeed()); 
-            
-            onClose(); 
-        } catch (err) {
-            console.error("Failed to post", err);
-            alert(err.response?.data?.message || "Failed to create post");
+            dispatch(fetchFeed());
+            onClose();
+
+        } catch (error) {
+            console.error("Failed to create post", error);
+            alert(error.response?.data?.message || "Error creating post");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="create-modal" onClick={e => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h3>Create new post</h3>
+        <div className="create-post-overlay" onClick={onClose}>
+            <div className="create-post-modal" onClick={e => e.stopPropagation()}>
+                
+                <div className="create-post-header">
+                    <span>Create new post</span>
                     <button className="close-btn" onClick={onClose}>
                         <FontAwesomeIcon icon={faTimes} />
                     </button>
                 </div>
 
-                <div className="modal-body">
+                <div className="create-post-body">
+
+                    <div className="user-info-row">
+                        <img 
+                            src={currentUser?.picture?.url || noProfile} 
+                            alt="" 
+                            className="cp-avatar" 
+                        />
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span className="cp-username">{currentUser?.username}</span>
+                            <span style={{ fontSize: '0.8rem', color: '#666' }}>
+                                Profile: {profileVisibility === 'private' ? 'Private 🔒' : 'Public 🌍'}
+                            </span>
+                        </div>
+                    </div>
+
                     <textarea 
-                        placeholder="What's on your mind?" 
+                        className="post-textarea" 
+                        placeholder={`What's on your mind, ${currentUser?.firstName}?`}
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        rows={4}
                     />
 
                     {previews.length > 0 && (
-                        <div className="image-preview-grid">
+                        <div className="image-preview-container">
                             {previews.map((src, index) => (
-                                <div key={index} className="preview-container">
-                                    <img src={src} alt="" />
-                                    <button onClick={() => removeImage(index)}>
+                                <div key={index} className="preview-wrapper">
+                                    <img src={src} alt="" className="preview-img" />
+                                    <button className="remove-img-btn" onClick={() => removeFile(index)}>
                                         <FontAwesomeIcon icon={faTimes} />
                                     </button>
                                 </div>
@@ -104,40 +128,52 @@ export default function CreatePost({ onClose }) {
                         </div>
                     )}
 
-                    <div className="controls-row">
-                        <div className="add-media" onClick={() => fileInputRef.current.click()}>
-                            <FontAwesomeIcon icon={faImage} />
-                            <span>Add Photos/Videos</span>
+                    <div className="visibility-section">
+                        <div className="visibility-row">
+                            <span className="vis-label">Visibility:</span>
+                            <select 
+                                className="vis-select" 
+                                value={visibility} 
+                                onChange={(e) => setVisibility(e.target.value)}
+                            >
+                                {allowedOptions.map(option => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
-                        <input 
-                            type="file" 
-                            multiple 
-                            ref={fileInputRef} 
-                            hidden 
-                            accept="image/*,video/*"
-                            onChange={handleFileChange}
-                        />
-
-                        <select 
-                            value={visibility} 
-                            onChange={(e) => setVisibility(e.target.value)}
-                            className="visibility-select"
-                        >
-                            <option value="public">Public</option>
-                            <option value="friends">Friends</option>
-                            <option value="private">Private</option>
-                        </select>
+                        
+                        <div className="caution-box">
+                            {visibility === 'public' && "Visible to everyone."}
+                            {visibility === 'friends' && "Visible only to your friends."}
+                            {visibility === 'private' && "Visible only to you."}
+                        </div>
                     </div>
-                </div>
 
-                <div className="modal-footer">
-                    <button 
-                        className="post-btn" 
-                        onClick={handleSubmit} 
-                        disabled={loading}
-                    >
-                        {loading ? "Posting..." : "Post"}
-                    </button>
+                    <div className="footer-actions">
+                        <div className="media-actions">
+                            <label className="add-media-btn" onClick={() => fileInputRef.current.click()}>
+                                <FontAwesomeIcon icon={faImage} />
+                            </label>
+                            <input 
+                                type="file" 
+                                hidden 
+                                multiple 
+                                accept="image/*,video/*"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                            />
+                        </div>
+
+                        <button 
+                            className="post-submit-btn" 
+                            onClick={handleSubmit}
+                            disabled={loading || (!content.trim() && files.length === 0)}
+                        >
+                            {loading ? "Posting..." : "Post"}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -23,7 +23,6 @@ import {
 
 const router = Router()
 
-// --- 1. Public Routes ---
 router.route("/register").post(
     uploadMulter.single("picture"),
     validateRegister,

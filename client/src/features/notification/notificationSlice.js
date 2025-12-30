@@ -61,6 +61,18 @@ export const deleteNotification = createAsyncThunk(
     }
 );
 
+export const markAllRead = createAsyncThunk(
+    "notification/markAllRead",
+    async (_, { rejectWithValue }) => {
+        try {
+            await api.post("/notification/read/all");
+            return;
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message);
+        }
+    }
+);
+
 const notificationSlice = createSlice({
     name: "notification",
     initialState: {
@@ -108,6 +120,13 @@ const notificationSlice = createSlice({
             })
             .addCase(deleteNotification.fulfilled, (state, action) => {
                 state.items = state.items.filter(item => item._id !== action.payload);
+            })
+
+            .addCase(markAllRead.pending, (state) => {
+                state.unreadCount = 0;
+                state.items.forEach(item => {
+                    item.isRead = true;
+                });
             });
     }
 });

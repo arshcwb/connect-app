@@ -9,26 +9,51 @@ import { fetchProfilePosts } from "../../features/profile/profileSlice";
 import noProfile from '../../assets/no-profile-picture.jpg';
 import '../../css/PostCard.css';
 import { Link } from 'react-router-dom';
+import CommentsModal from '../comment/CommentsModal';
 
 export default function PostCard({ post }) {
     const { _id, author, content, media, likesCount, commentsCount } = post;
     const dispatch = useDispatch();
     
     const currentUser = useSelector((state) => state.auth.user);
-    const likedPostIds = useSelector((state) => state.auth.userLikes?.postIds || []);
-    
     const currentUserId = currentUser?.user?._id || currentUser?._id;
-    const isMe = currentUserId === author._id;
-    
+
+    const { friendIds, sentRequestIds } = useSelector((state) => state.friend || { friendIds: [], sentRequestIds: [] });
+
+    const authorId = author?._id || author;
+    const authorName = author?.firstName ? `${author.firstName} ${author.lastName}` : "Unknown";
+    const authorUsername = author?.username || "unknown";
+    const authorPic = author?.picture?.url || noProfile;
+
+    const isMe = currentUserId?.toString() === authorId?.toString();
+
+    const checkRelation = (list, targetId) => {
+        if (!list || !targetId) return false;
+        return list.some(item => {
+            const itemId = typeof item === 'object' ? item._id : item;
+            return itemId?.toString() === targetId.toString();
+        });
+    };
+
+    const isFriend = checkRelation(friendIds, authorId);
+    const isPending = checkRelation(sentRequestIds, authorId);
+
+    const likedPostIds = useSelector((state) => state.auth.userLikes?.postIds || []);
     const isLikedByMe = likedPostIds.includes(_id);
 
     const [liked, setLiked] = useState(isLikedByMe);
     const [count, setCount] = useState(likesCount);
+    const [commentsCountLocal, setCommentsCountLocal] = useState(commentsCount);
     const [isLiking, setIsLiking] = useState(false);
     
+    const [requestSent, setRequestSent] = useState(isPending); 
+
     const [zoomIndex, setZoomIndex] = useState(null);
     const [showLikesModal, setShowLikesModal] = useState(false);
+    const [showCommentsModal, setShowCommentsModal] = useState(false);
+
     const [likedUsers, setLikedUsers] = useState([]);
+    const [totalLikesInModal, setTotalLikesInModal] = useState(0); 
     const [loadingLikes, setLoadingLikes] = useState(false);
     
     const [isDeleting, setIsDeleting] = useState(false);
@@ -40,6 +65,14 @@ export default function PostCard({ post }) {
     useEffect(() => {
         setCount(likesCount);
     }, [likesCount]);
+
+    useEffect(() => {
+        setCommentsCountLocal(commentsCount);
+    }, [commentsCount]);
+
+    useEffect(() => {
+        setRequestSent(isPending);
+    }, [isPending]);
 
     const handleDelete = async () => {
         const confirmDelete = window.confirm("Are you sure you want to delete this post?");
@@ -76,12 +109,27 @@ export default function PostCard({ post }) {
         }
     };
 
+    const handleFollow = async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        setRequestSent(true);
+
+        try {
+            await api.post(`/friend/requests/send/${authorId}`);
+        } catch (error) {
+            console.error("Follow failed", error);
+            setRequestSent(false);
+        }
+    };
+
     const fetchLikedUsers = async () => {
         setShowLikesModal(true);
         setLoadingLikes(true);
         try {
             const res = await api.get(`/like/get/post/${_id}`);
             setLikedUsers(res.data.data.users);
+            setTotalLikesInModal(res.data.data.total);
         } catch (err) {
             console.error(err);
         } finally {
@@ -117,18 +165,33 @@ export default function PostCard({ post }) {
     return (
         <div className="post-card">
             <div className="post-header">
-                <Link to={`/profile/${author.username}`} className="header-left-link">
+                <Link to={`/profile/${authorUsername}`} className="header-left-link">
                     <div className="header-left">
                         <img 
-                            src={author.picture?.url || noProfile} 
+                            src={authorPic} 
                             className="avatar" 
                             alt="" 
                         />
                         <div className="author-info">
-                            <span className="author-name">
-                                {author.firstName} {author.lastName}
-                            </span>
-                            <span className="author-username">@{author.username}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span className="author-name">
+                                    {authorName}
+                                </span>
+                                
+                                {!isMe && !isFriend && (
+                                    requestSent ? (
+                                        <span className="following-text">Requested</span>
+                                    ) : (
+                                        <button 
+                                            className="follow-btn" 
+                                            onClick={handleFollow}
+                                        >
+                                            Follow
+                                        </button>
+                                    )
+                                )}
+                            </div>
+                            <span className="author-username">@{authorUsername}</span>
                         </div>
                     </div>
                 </Link>
@@ -172,9 +235,9 @@ export default function PostCard({ post }) {
                     <span className="count-link" onClick={fetchLikedUsers}>{count}</span>
                 </div>
                 
-                <button className="stat-btn">
+                <button className="stat-btn" onClick={() => setShowCommentsModal(true)}>
                     <FontAwesomeIcon icon={faComment} />
-                    <span>{commentsCount}</span>
+                    <span>{commentsCountLocal}</span>
                 </button>
             </div>
 
@@ -189,17 +252,40 @@ export default function PostCard({ post }) {
                         </div>
                         <div className="modal-body">
                             {loadingLikes ? <p>Loading...</p> : likedUsers.length > 0 ? (
-                                likedUsers.map(user => (
-                                    <div key={user._id} className="user-row">
-                                        <div className="user-row-info">
-                                            <p className="user-row-username">@{user.username}</p>
+                                <>
+                                    {likedUsers.map(user => (
+                                        <div key={user._id} className="user-row">
+                                            <div className="user-row-info">
+                                                <p className="user-row-username">@{user.username}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))
+                                    ))}
+                                    
+                                    {totalLikesInModal > likedUsers.length && (
+                                        <div style={{ 
+                                            padding: '12px', 
+                                            textAlign: 'center', 
+                                            color: '#888', 
+                                            borderTop: '1px solid #f0f0f0',
+                                            fontSize: '0.9rem',
+                                            fontStyle: 'italic'
+                                        }}>
+                                            And {totalLikesInModal - likedUsers.length} others...
+                                        </div>
+                                    )}
+                                </>
                             ) : <p>No likes yet.</p>}
                         </div>
                     </div>
                 </div>
+            )}
+
+            {showCommentsModal && (
+                <CommentsModal 
+                    postId={_id} 
+                    onClose={() => setShowCommentsModal(false)}
+                    updateCommentsCount={(num) => setCommentsCountLocal(prev => prev + num)}
+                />
             )}
 
             {zoomIndex !== null && (

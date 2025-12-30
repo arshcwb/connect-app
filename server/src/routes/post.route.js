@@ -27,14 +27,14 @@ router.route("/all/:userId").get(
     getAllPosts
 )
 
-router.route("/:postId").get(
-    jwtAuth, 
-    getPost
-)
-
 router.route("/count/:userId").get(
     jwtAuth, 
     getPostCount
+)
+
+router.route("/:postId").get(
+    jwtAuth, 
+    getPost
 )
 
 export default router

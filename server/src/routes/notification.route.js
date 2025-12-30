@@ -15,14 +15,18 @@ router.route("/all").get(
     jwtAuth,
     getNotifications
 )
-
-router.route("/read/:id").post(
+router.route("/all").delete(
     jwtAuth,
-    markNotificationRead
+    deleteAllNotifications
 )
+
 router.route("/read/all").post(
     jwtAuth,
     markAllNotificationsRead
+)
+router.route("/read/:id").post(
+    jwtAuth,
+    markNotificationRead
 )
 router.route("/count/unread").get(
     jwtAuth,
@@ -32,10 +36,6 @@ router.route("/count/unread").get(
 router.route("/:id").delete(
     jwtAuth,
     deleteNotification
-)
-router.route("/all").delete(
-    jwtAuth,
-    deleteAllNotifications
 )
 
 export default router

@@ -97,7 +97,6 @@ export const toggleLike = asyncHandler(async (req, res) => {
     )
 })
 
-
 export const getLikes = asyncHandler(async (req, res) => {
     const userId = req.user._id
     const { targetType, targetId } = req.params
@@ -144,14 +143,22 @@ export const getLikes = asyncHandler(async (req, res) => {
         }
     }
 
+    const totalCount = await Like.countDocuments({
+        targetType: normalizedType,
+        targetId
+    });
+
     const likes = await Like.find({
         targetType: normalizedType,
         targetId
-    }).populate("user", "username firstName lastName picture")
+    })
+    .sort({ createdAt: -1 })
+    .limit(10)
+    .populate("user", "username firstName lastName picture")
 
     res.status(200).json(
         new ApiResponse(200, "Likes fetched", {
-            count: likes.length,
+            total: totalCount,
             users: likes.map(like => like.user)
         })
     )

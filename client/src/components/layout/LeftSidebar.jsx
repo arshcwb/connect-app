@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react"; // Added useRef
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,7 +11,8 @@ import {
     markNotificationRead,
     clearAllNotifications,
     deleteNotification,
-    markRequestAccepted
+    markRequestAccepted,
+    markAllRead
 } from "../../features/notification/notificationSlice";
 import { logoutUser } from "../../features/auth/authSlice";
 
@@ -25,9 +26,11 @@ import EditProfileModal from "../profile/EditProfileModal";
 export default function LeftSidebar() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const sidebarRef = useRef(null);
     
     const { unreadCount, items: notifications, loading: notifLoading } = useSelector(state => state.notification);
-    const { user: currentUser } = useSelector(state => state.auth);
+    const { user: currentUser, isLoggingOut } = useSelector(state => state.auth);
 
     const [activeTab, setActiveTab] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
@@ -40,16 +43,40 @@ export default function LeftSidebar() {
     const userData = currentUser?.user || currentUser;
 
     useEffect(() => {
-        if (currentUser) {
-            dispatch(fetchUnreadCount());
+        const handleClickOutside = (event) => {
+            if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+                setActiveTab(null);
+            }
+        };
+
+        const handleEscKey = (event) => {
+            if (event.key === 'Escape') {
+                setActiveTab(null);
+            }
+        };
+
+        if (activeTab) {
+            document.addEventListener("mousedown", handleClickOutside);
+            document.addEventListener("keydown", handleEscKey);
         }
-    }, [dispatch, currentUser]);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("keydown", handleEscKey);
+        };
+    }, [activeTab]);
 
     useEffect(() => {
-        if (activeTab === "notifications") {
+        if (currentUser && !isLoggingOut) {
+            dispatch(fetchUnreadCount());
+        }
+    }, [dispatch, currentUser, isLoggingOut]);
+
+    useEffect(() => {
+        if (activeTab === "notifications" && !isLoggingOut) {
             dispatch(fetchNotifications());
         }
-    }, [activeTab, dispatch]);
+    }, [activeTab, dispatch, isLoggingOut]);
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(async () => {
@@ -95,6 +122,10 @@ export default function LeftSidebar() {
         }
     };
 
+    const handleMarkAllRead = () => {
+        dispatch(markAllRead());
+    };
+
     const handleLogout = async () => {
         try {
             await dispatch(logoutUser()).unwrap();
@@ -130,7 +161,7 @@ export default function LeftSidebar() {
     };
 
     return (
-        <div className="sidebar-container">
+        <div className="sidebar-container" ref={sidebarRef}>
            
             <aside className={`left-sidebar ${activeTab ? 'collapsed' : 'expanded'}`}>
                 
@@ -172,7 +203,6 @@ export default function LeftSidebar() {
                     {!activeTab && <span className="nav-label">Settings</span>}
                 </div>
 
-                {/* CHANGED TO DIV TO FIX HYDRATION ERROR */}
                 <div 
                     className="nav-item" 
                     id="logout-btn" 
@@ -229,22 +259,41 @@ export default function LeftSidebar() {
                 }}>
                     <h2 style={{ margin: 0, fontSize: '1.5rem' }}>Notifications</h2>
                     
-                    <button 
-                        onClick={handleClearAllNotifications}
-                        disabled={notifications.length === 0}
-                        style={{ 
-                            background: 'transparent', 
-                            border: 'none', 
-                            color: notifications.length === 0 ? '#ccc' : '#ed4956',
-                            cursor: notifications.length === 0 ? 'default' : 'pointer', 
-                            fontSize: '0.9rem',
-                            fontWeight: '600',
-                            padding: '5px 10px',
-                            transition: 'color 0.2s'
-                        }}
-                    >
-                        Clear All
-                    </button>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        {unreadCount > 0 && (
+                            <button 
+                                onClick={handleMarkAllRead}
+                                style={{ 
+                                    background: 'transparent', 
+                                    border: 'none', 
+                                    color: '#0095f6', 
+                                    cursor: 'pointer', 
+                                    fontSize: '0.85rem',
+                                    fontWeight: '600',
+                                    padding: '5px',
+                                }}
+                            >
+                                Mark read
+                            </button>
+                        )}
+
+                        <button 
+                            onClick={handleClearAllNotifications}
+                            disabled={notifications.length === 0}
+                            style={{ 
+                                background: 'transparent', 
+                                border: 'none', 
+                                color: notifications.length === 0 ? '#ccc' : '#ed4956',
+                                cursor: notifications.length === 0 ? 'default' : 'pointer', 
+                                fontSize: '0.85rem',
+                                fontWeight: '600',
+                                padding: '5px',
+                                transition: 'color 0.2s'
+                            }}
+                        >
+                            Clear All
+                        </button>
+                    </div>
                 </div>
 
                 <div className="panel-results">
@@ -278,6 +327,7 @@ export default function LeftSidebar() {
                                     <span>
                                         {notif.type === 'like' && ' liked your post.'}
                                         {notif.type === 'comment' && ' commented on your post.'}
+                                        {notif.type === 'reply' && ' replied to your comment.'}
                                         {notif.type === 'follow' && ' started following you.'}
                                         {notif.type === 'friend_accept' && ' is your friend now.'}
                                         {notif.type === 'friend_request' && ' sent you a friend request.'}

@@ -3,7 +3,10 @@ import api from "../../services/api";
 
 export const fetchCurrentUser = createAsyncThunk(
   "auth/fetchCurrentUser",
-  async (_, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
+    const { auth } = getState();
+    if (auth.isLoggingOut) return rejectWithValue("Logging out");
+
     try {
       const res = await api.get("/user/me");
       return res.data.data;
@@ -58,6 +61,7 @@ const authSlice = createSlice({
         user: null,
         isAuthenticated: false,
         loading: true,
+        isLoggingOut: false,
         userLikes: { postIds: [], commentIds: [] },
         error: null,
     },
@@ -74,6 +78,13 @@ const authSlice = createSlice({
                 state.userLikes.postIds.push(postId);
             }
         },
+        logoutLocal: (state) => {
+            state.user = null;
+            state.isAuthenticated = false;
+            state.loading = false;
+            state.isLoggingOut = false;
+            state.userLikes = { postIds: [], commentIds: [] };
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -98,16 +109,24 @@ const authSlice = createSlice({
             state.loading = false;
             state.user = action.payload;
             state.isAuthenticated = true;
+            state.isLoggingOut = false;
         })
         .addCase(loginUser.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
         })
+        .addCase(logoutUser.pending, (state) => {
+            state.isLoggingOut = true;
+        })
         .addCase(logoutUser.fulfilled, (state) => {
             state.user = null;
             state.isAuthenticated = false;
             state.loading = false;
+            state.isLoggingOut = false;
             state.userLikes = { postIds: [], commentIds: [] };
+        })
+        .addCase(logoutUser.rejected, (state) => {
+             state.isLoggingOut = false;
         })
         .addCase(fetchUserLikes.fulfilled, (state, action) => {
             state.userLikes = {
@@ -118,5 +137,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { resetError, toggleLocalLike } = authSlice.actions;
+export const { resetError, toggleLocalLike, logoutLocal } = authSlice.actions;
 export default authSlice.reducer;
