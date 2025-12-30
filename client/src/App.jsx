@@ -8,6 +8,7 @@ import Login from "./pages/Login"
 import Register from "./pages/Register"
 import Home from "./pages/Home"
 import Profile from "./pages/Profile"
+import MessagesPage from "./pages/MessagesPage"
 import ProtectedRoute from "./components/routes/ProtectedRoute"
 import PublicRoute from "./components/routes/PublicRoute"
 import { fetchMyFriends, fetchSentRequests } from "./features/friend/friendSlice"
@@ -66,6 +67,13 @@ export default function App() {
           </ProtectedRoute>
         } 
         />
+        <Route path="/messages" element={
+          <ProtectedRoute>
+              <MessagesPage />
+          </ProtectedRoute>
+        } 
+        />
+        
       </Routes>
     </BrowserRouter>
   )

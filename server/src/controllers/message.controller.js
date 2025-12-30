@@ -22,9 +22,18 @@ export const getMessages = asyncHandler(async (req, res) => {
         throw new ApiError(403, "Access denied")
     }
 
+    await Message.updateMany(
+        { 
+            conversation: conversationId, 
+            sender: { $ne: userId }, 
+            isRead: false 
+        },
+        { $set: { isRead: true } }
+    );
+
     const messages = await Message.find({ conversation: conversationId })
         .sort({ createdAt: 1 })
-        .populate("sender", "username picture")
+        .populate("sender", "username firstName lastName picture")
 
     res.status(200).json(
         new ApiResponse(200, "Messages fetched", messages)
@@ -54,7 +63,7 @@ export const sendMessage = asyncHandler(async (req, res) => {
         throw new ApiError(403, "You are not part of this conversation")
     }
 
-    const message = await Message.create({
+    let message = await Message.create({
         conversation: conversationId,
         sender: userId,
         content
@@ -63,6 +72,8 @@ export const sendMessage = asyncHandler(async (req, res) => {
     await Conversation.findByIdAndUpdate(conversationId, {
         lastMessage: message._id
     })
+
+    message = await message.populate("sender", "username firstName lastName picture")
 
     res.status(201).json(
         new ApiResponse(201, "Message sent", message)

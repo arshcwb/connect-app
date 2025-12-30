@@ -1,8 +1,19 @@
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { openChatWithUser } from '../../features/message/messageSlice';
 import FriendButton from './FriendButton';
 import noProfile from '../../assets/no-profile-picture.jpg';
 
 export default function ProfileHeader({ user, friendsCount, postCount, isMe, onEdit }) {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     if (!user) return null;
+
+    const handleMessage = async () => {
+        await dispatch(openChatWithUser(user._id));
+        navigate('/messages'); 
+    };
 
     return (
         <div className="profile-header-card">
@@ -34,7 +45,12 @@ export default function ProfileHeader({ user, friendsCount, postCount, isMe, onE
                     {isMe ? (
                         <button className="edit-btn" onClick={onEdit}>Edit Profile</button>
                     ) : (
-                        <FriendButton userId={user._id}/>
+                        <>
+                            <FriendButton userId={user._id}/>
+                            <button className="message-btn" onClick={handleMessage}>
+                                Message
+                            </button>
+                        </>
                     )}
                 </div>
             </div>

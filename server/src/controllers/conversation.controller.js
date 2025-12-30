@@ -1,30 +1,37 @@
 import Conversation from "../models/conversation.model.js"
 import Friend from "../models/friend.model.js"
+import Message from "../models/message.model.js" 
 import ApiError from "../../utils/ApiError.js"
 import ApiResponse from "../../utils/ApiResponse.js"
 import { asyncHandler } from "../../utils/asyncHandler.js"
 
 export const getConversations = asyncHandler(async (req, res) => {
     const userId = req.user._id
-    if(!userId){
-        throw new ApiError(401, "User is unauthorized")
-    }
-
+    
     const conversations = await Conversation.find({
         participants: userId
     })
-        .populate("participants", "username picture")
-        .populate("lastMessage")
-        .sort({ updatedAt: -1 })
+    .populate("participants", "username firstName lastName picture")
+    .populate("lastMessage")
+    .sort({ updatedAt: -1 })
 
-    const result = conversations.map(c => ({
-        _id: c._id,
-        user: c.participants.find(p => p._id.toString() !== userId.toString()),
-        lastMessage: c.lastMessage
-    }))
+    const conversationsWithUnread = await Promise.all(conversations.map(async (conv) => {
+        if (!conv.lastMessage) return { ...conv.toObject(), unreadCount: 0 };
+
+        const unreadCount = await Message.countDocuments({
+            conversation: conv._id,
+            sender: { $ne: userId }, 
+            isRead: false            
+        });
+        
+        return {
+            ...conv.toObject(),
+            unreadCount
+        }
+    }));
 
     res.status(200).json(
-        new ApiResponse(200, "Conversations fetched", result)
+        new ApiResponse(200, "Conversations fetched", conversationsWithUnread)
     )
 })
 
@@ -32,9 +39,7 @@ export const getConversations = asyncHandler(async (req, res) => {
 export const getOrCreateConversation = asyncHandler(async (req, res) => {
     const userId = req.user._id
     const { otherUserId } = req.params
-    if(!userId){
-        throw new ApiError(401, "User is unauthorized")
-    }
+
     if (userId.toString() === otherUserId) {
         throw new ApiError(400, "You cannot chat with yourself")
     }
@@ -56,6 +61,7 @@ export const getOrCreateConversation = asyncHandler(async (req, res) => {
             participants: [userId, otherUserId]
         })
     }
+    conversation = await conversation.populate("participants", "username firstName lastName picture")
 
     res.status(200).json(
         new ApiResponse(200, "Conversation ready", conversation)

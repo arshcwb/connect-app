@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from "react"; // Added useRef
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faSearch, faEnvelope, faHeart, faUser, faSquarePlus, faBars } from "@fortawesome/free-solid-svg-icons";
 
 import api from "../../services/api";
+import { fetchConversations } from "../../features/message/messageSlice"; 
+
 import { 
     fetchUnreadCount, 
     fetchNotifications, 
@@ -30,6 +32,8 @@ export default function LeftSidebar() {
     const sidebarRef = useRef(null);
     
     const { unreadCount, items: notifications, loading: notifLoading } = useSelector(state => state.notification);
+    
+    const { conversations } = useSelector(state => state.message);
     const { user: currentUser, isLoggingOut } = useSelector(state => state.auth);
 
     const [activeTab, setActiveTab] = useState(null);
@@ -39,6 +43,8 @@ export default function LeftSidebar() {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [showEditProfile, setShowEditProfile] = useState(false);
+
+    const totalUnreadMessages = conversations.reduce((acc, conv) => acc + (conv.unreadCount || 0), 0);
 
     const userData = currentUser?.user || currentUser;
 
@@ -69,6 +75,7 @@ export default function LeftSidebar() {
     useEffect(() => {
         if (currentUser && !isLoggingOut) {
             dispatch(fetchUnreadCount());
+            dispatch(fetchConversations());
         }
     }, [dispatch, currentUser, isLoggingOut]);
 
@@ -175,10 +182,17 @@ export default function LeftSidebar() {
                     {!activeTab && <span className="nav-label">Search</span>}
                 </div>
 
-                <div className="nav-item">
-                    <FontAwesomeIcon icon={faEnvelope} className="nav-icon" />
+                <Link 
+                    to="/messages" 
+                    className="nav-item" 
+                    onClick={() => setActiveTab(null)}
+                >
+                    <div style={{ position: 'relative' }}>
+                        <FontAwesomeIcon icon={faEnvelope} className="nav-icon" />
+                        {totalUnreadMessages > 0 && <span className="badge">{totalUnreadMessages}</span>}
+                    </div>
                     {!activeTab && <span className="nav-label">Messages</span>}
-                </div>
+                </Link>
 
                 <div className="nav-item" onClick={() => toggleTab('notifications')}>
                     <div style={{ position: 'relative' }}>

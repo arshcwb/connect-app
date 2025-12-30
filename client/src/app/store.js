@@ -4,12 +4,14 @@ import feedReducer from "../features/feed/feedSlice"
 import profileReducer from "../features/profile/profileSlice"
 import friendReducer from "../features/friend/friendSlice"
 import notificationReducer from "../features/notification/notificationSlice"
+import messageReducer from "../features/message/messageSlice"
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     feed: feedReducer,
     profile: profileReducer,
     friend: friendReducer,
-    notification: notificationReducer
+    notification: notificationReducer,
+    message: messageReducer
   }
 })

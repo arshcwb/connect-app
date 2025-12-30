@@ -1,0 +1,264 @@
+.messages-container {
+    display: flex;
+    height: calc(100vh - 60px); 
+    max-width: 1600px;
+    margin: 20px auto;
+    background-color: #fff;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.msg-sidebar {
+    width: 350px;
+    border-right: 1px solid #dbdbdb;
+    display: flex;
+    flex-direction: column;
+}
+
+.msg-header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #dbdbdb;
+    font-weight: 600;
+    font-size: 16px;
+    position: relative;
+}
+
+.msg-header h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.msg-header svg {
+    position: absolute;
+    right: 20px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.conv-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.conv-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 20px;
+    cursor: pointer;
+}
+
+.conv-item:hover {
+    background-color: #fafafa;
+}
+
+.conv-item.active {
+    background-color: #efefef;
+}
+
+.conv-avatar {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 12px;
+    border: 1px solid #dbdbdb;
+}
+
+.conv-info {
+    overflow: hidden;
+}
+
+.conv-name {
+    margin: 0 0 2px 0;
+    font-size: 14px;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conv-last-msg {
+    margin: 0;
+    font-size: 12px;
+    color: #8e8e8e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+}
+
+.chat-header {
+    height: 60px;
+    padding: 0 20px;
+    border-bottom: 1px solid #dbdbdb;
+    display: flex;
+    align-items: center;
+}
+
+.chat-header-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 12px;
+}
+
+.chat-header-info h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.chat-header-username {
+    font-size: 12px;
+    color: #8e8e8e;
+}
+
+.chat-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.message-row {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 8px;
+}
+
+.row-own {
+    justify-content: flex-end;
+}
+
+.row-other {
+    justify-content: flex-start;
+}
+
+.msg-avatar-small {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+    margin-bottom: 4px;
+}
+
+.message-bubble {
+    max-width: 236px;
+    padding: 16px;
+    border-radius: 22px;
+    font-size: 14px;
+    line-height: 18px;
+    
+    word-break: break-word;
+    white-space: pre-wrap; 
+    overflow-wrap: break-word;
+}
+
+.msg-own {
+    background-color: #efefef;
+    color: #262626;
+    border-bottom-right-radius: 4px;
+}
+
+.msg-other {
+    background-color: #fff;
+    border: 1px solid #efefef;
+    color: #262626;
+    border-bottom-left-radius: 4px;
+}
+
+.msg-own {
+    background-color: #3797f0;
+    color: #fff;
+}
+
+.chat-footer {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper {
+    flex: 1;
+    position: relative;
+    border: 1px solid #dbdbdb;
+    border-radius: 22px;
+    padding: 0 16px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+}
+
+.chat-input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    background: transparent;
+}
+
+.send-btn {
+    background: none;
+    border: none;
+    color: #0095f6;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.send-btn:disabled {
+    color: #bce3fd;
+    cursor: default;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #262626;
+}
+
+.empty-icon-circle {
+    width: 96px;
+    height: 96px;
+    border: 2px solid #262626;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.empty-state h2 {
+    font-size: 22px;
+    font-weight: 300;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    font-size: 14px;
+    color: #8e8e8e;
+}
+
+@media (max-width: 900px) {
+    .msg-sidebar{
+        width: 160px;
+    }
+}
